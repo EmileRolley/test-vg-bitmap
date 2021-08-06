@@ -1,49 +1,57 @@
-open Bigarray
 open Bimage
 open Gg
 open Vg
+module B = Vgr_bitmap.F32_ba
+module Bitmap_renderer = Vgr_bitmap.Make (B)
 
 (* To PNG functions (from school project). *)
 
-(** Converts a Graphics.color [c] into its rgb code. *)
-let color_to_rgb (rgb : float) =
-  (* let rgb = Int32.to_int rgb in *)
-  (* Printf.printf "rgb: %dd\n" rgb; *)
-  let rgb = Int.of_float rgb in
-  let r = (rgb lsr 16) land 0xFF in
-  (* Printf.printf "r: %d\n" r; *)
-  let g = (rgb lsr 8) land 0xFF in
-  (* Printf.printf "g: %d\n" g; *)
-  let b = rgb land 0xFF in
-  (* Printf.printf "b: %d\n" b; *)
-  (r, g, b)
+(*(1** Converts a Graphics.color [c] into its rgb code. *1) *)
+(*let color_to_rgb (rgb : float) = *)
+(*  (1* let rgb = Int32.to_int rgb in *1) *)
+(*  (1* Printf.printf "rgb: %dd\n" rgb; *1) *)
+(*  let rgb = Int.of_float rgb in *)
+(*  let r = (rgb lsr 16) land 0xFF in *)
+(*  (1* Printf.printf "r: %d\n" r; *1) *)
+(*  let g = (rgb lsr 8) land 0xFF in *)
+(*  (1* Printf.printf "g: %d\n" g; *1) *)
+(*  let b = rgb land 0xFF in *)
+(*  (1* Printf.printf "b: %d\n" b; *1) *)
+(*  (r, g, b) *)
 
-let to_255_int_rgb v = Int.of_float (255. *. v)
+(*let to_255_int_rgb v = Int.of_float (255. *. v) *)
 
-let rgba_to_int rgb =
-  let open Gg.V4 in
-  let sa res = Stdlib.( + ) (res lsl 8) in
-  let res = x rgb |> to_255_int_rgb in
-  Printf.printf "res1: %d\n" res;
-  let res = y rgb |> to_255_int_rgb |> sa res in
-  Printf.printf "res2: %d\n" res;
-  let res = z rgb |> to_255_int_rgb |> sa res in
-  Printf.printf "res3: %d\n" res;
-  res
+(*let rgba_to_int rgb = *)
+(*  let open Gg.V4 in *)
+(*  let sa res = Stdlib.( + ) (res lsl 8) in *)
+(*  let res = x rgb |> to_255_int_rgb in *)
+(*  Printf.printf "res1: %d\n" res; *)
+(*  let res = y rgb |> to_255_int_rgb |> sa res in *)
+(*  Printf.printf "res2: %d\n" res; *)
+(*  let res = z rgb |> to_255_int_rgb |> sa res in *)
+(*  Printf.printf "res3: %d\n" res; *)
+(*  res *)
 
 (** Colors the pixel at ([x], [y]) of [img] with the color [c] *)
 let color_pixel (img : (float, Bimage.f32, Bimage.rgb) Bimage.Image.t) x y c =
-  let r, g, b = color_to_rgb c in
-  Image.set img x y 0 (Int.to_float (r / 255));
-  Image.set img x y 1 (Int.to_float (g / 255));
-  Image.set img x y 2 (Int.to_float (b / 255))
+  Image.set img x y 0 (Color.r c);
+  Image.set img x y 1 (Color.g c);
+  Image.set img x y 2 (Color.b c)
 
 (** Save the drawing as a PNG in [path] *)
-let save path (ba, w, h) =
-  (* NOTE: why I need to use the height instead of the width? *)
+let save path bitmap =
+  let w = B.width bitmap in
+  let h = B.height bitmap in
   let img = Image.create f32 Bimage.rgb w h in
+  (* Printf.printf "w: %d, h: %d\n" Bimage.Image.for_each_pixel *)
   ignore
-    (Image.for_each (fun x y _px -> color_pixel img x y ba.{(x * h) + y}) img);
+    (Image.for_each_pixel
+       (fun x y _px ->
+         let x' = Int.to_float x in
+         let y' = Int.to_float y in
+         (* Printf.printf "(%d, %d) (%f, %f)\n" x y x' y'; *)
+         color_pixel img x y (B.get bitmap x' y'))
+       img);
   Bimage_unix.Magick.write path img;
   Printf.printf "PNG file saved here: %s\n" path
 
@@ -61,23 +69,19 @@ let () =
   let h = int_of_float (res *. Size2.h size) in
   Printf.printf "w: %d, h: %d\n" w h;
 
-  (* let raster =  in *)
-  let buff = Ba.create Ba.Float32 (w * h) in
-
-  (* let raster = *)
-  (*   Gg.Raster.v (`D2 size) *)
-  (*     (Raster.Sample.format (`Color (Color.p_rgb_l, true)) `Int8) *)
-  (*     (`Int8 buff) *)
-  (* in *)
-
-  (* FIXME: not white. *)
-  let blue = rgba_to_int (Color.v_srgb 0.5 0.5 1.) in
-  Printf.printf "blue %d\n" blue;
-  Ba.fill buff (Int.to_float blue);
-  Printf.printf "dim: %d\n" (Array1.dim buff);
-  let target = Vgr_bitmap.target () in
+  (* Ba.fill buff (Int.to_float blue); *)
+  (* Printf.printf "dim: %d\n" (Array1.dim buff); *)
+  let bitmap = B.create w h in
+  for i = 0 to w - 1 do
+    B.set bitmap (Int.to_float i) 0. Color.white
+  done;
+  for i = 0 to w - 1 do
+    B.set bitmap (Int.to_float i) (Int.to_float (h - 1)) Color.green
+  done;
+  Printf.printf "width: %d, height: %d\n" (B.width bitmap) (B.height bitmap);
+  let target = Bitmap_renderer.target bitmap in
   let warn w = Vgr.pp_warning Format.err_formatter w in
   let r = Vgr.create ~warn target `Other in
   ignore (Vgr.render r (`Image (size, view, image)));
   ignore (Vgr.render r `End);
-  save "testoutput.png" (buff, w, h)
+  save "testoutput.png" bitmap
