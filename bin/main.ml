@@ -43,34 +43,47 @@ let save path bitmap =
   let w = B.width bitmap in
   let h = B.height bitmap in
   let img = Image.create f32 Bimage.rgb w h in
-  (* Printf.printf "w: %d, h: %d\n" Bimage.Image.for_each_pixel *)
   ignore
     (Image.for_each_pixel
        (fun x y _px ->
          let x' = Int.to_float x in
          let y' = Int.to_float y in
-         (* Printf.printf "(%d, %d) (%f, %f)\n" x y x' y'; *)
          color_pixel img x y (B.get bitmap x' y'))
        img);
   Bimage_unix.Magick.write path img;
   Printf.printf "PNG file saved here: %s\n" path
 
-let () =
-  let aspect = 1.618 in
-  let size = Size2.v (aspect *. 10.) 10. (* mm *) in
-  let view = Box2.v P2.o (Size2.v aspect 1.) in
-  (* let circle = P.empty |> P.circle (P2.v 0.5 0.5) 0.4 in *)
-  (* let image = I.cut circle (I.const (Color.v_srgb 0.314 0.784 0.471)) in *)
-  let image = I.const Color.red in
+let get_render_time yield =
+  let s = Unix.gettimeofday () in
+  yield ();
+  let e = Unix.gettimeofday () in
+  e -. s
 
-  (* How the renderer should be used. *)
+let log_rendering name yield =
+  Printf.printf "[LOG] - Rendering %s image\n" name;
+  let r_time = yield () in
+  Printf.printf "[LOG] - Done in %fs\n" r_time
+
+let render_png_cairo file view size img =
+  let res = 300. /. 0.0254 in
+  let fmt = `Png (Size2.v res res) in
+  let warn w = Vgr.pp_warning Format.err_formatter w in
+  let oc = open_out file in
+  let r = Vgr.create ~warn (Vgr_cairo.stored_target fmt) (`Channel oc) in
+  let r_time =
+    get_render_time (fun _ ->
+        ignore (Vgr.render r (`Image (size, view, img)));
+        ignore (Vgr.render r `End))
+  in
+  close_out oc;
+  r_time
+
+let render_bitmap file view size img =
   let res = 300. /. 25.4 in
   let w = int_of_float (res *. Size2.w size) in
   let h = int_of_float (res *. Size2.h size) in
   Printf.printf "w: %d, h: %d\n" w h;
 
-  (* Ba.fill buff (Int.to_float blue); *)
-  (* Printf.printf "dim: %d\n" (Array1.dim buff); *)
   let bitmap = B.create w h in
   for i = 0 to w - 1 do
     B.set bitmap (Int.to_float i) 0. Color.white
@@ -82,6 +95,25 @@ let () =
   let target = Bitmap_renderer.target bitmap in
   let warn w = Vgr.pp_warning Format.err_formatter w in
   let r = Vgr.create ~warn target `Other in
-  ignore (Vgr.render r (`Image (size, view, image)));
-  ignore (Vgr.render r `End);
-  save "testoutput.png" bitmap
+  let r_time =
+    get_render_time (fun _ ->
+        ignore (Vgr.render r (`Image (size, view, img)));
+        ignore (Vgr.render r `End))
+  in
+  save file bitmap;
+  r_time
+
+let () =
+  let aspect = 1.618 in
+  let size = Size2.v (aspect *. 10.) 10. (* mm *) in
+  let view = Box2.v P2.o (Size2.v aspect 1.) in
+  (* let circle = P.empty |> P.circle (P2.v 0.5 0.5) 0.4 in *)
+  (* let image = I.cut circle (I.const (Color.v_srgb 0.314 0.784 0.471)) in *)
+  let l = P.empty |> P.line (P2.v 0.5 0.5) in
+  let image =
+    I.cut ~area:(`O { P.o with P.width = 0.1 }) l (I.const Color.red)
+  in
+  log_rendering "cairo" (fun _ -> render_png_cairo "cairo.png" view size image);
+  log_rendering "bitmap" (fun _ -> render_bitmap "bitmap.png" view size image)
+
+(* How the renderer should be used. *)

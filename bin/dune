@@ -2,5 +2,5 @@
   (name main)
   (public_name vg-bitmap-test)
   (modules main)
-  (libraries gg vg vg.bitmap bimage bimage-unix bigarray)
+  (libraries gg vg vg.bitmap vg.cairo bimage bimage-unix bigarray)
   (flags (:standard -open StdLabels)))
