@@ -40,8 +40,8 @@ let color_pixel (img : (float, Bimage.f32, Bimage.rgb) Bimage.Image.t) x y c =
 
 (** Save the drawing as a PNG in [path] *)
 let save path bitmap =
-  let w = B.width bitmap in
-  let h = B.height bitmap in
+  let w = B.w bitmap in
+  let h = B.h bitmap in
   let img = Image.create f32 Bimage.rgb w h in
   ignore
     (Image.for_each_pixel
@@ -60,7 +60,7 @@ let get_render_time yield =
   e -. s
 
 let log_rendering name yield =
-  Printf.printf "[LOG] - Rendering %s image\n" name;
+  Printf.printf "\n[LOG] - Rendering %s image\n" name;
   let r_time = yield () in
   Printf.printf "[LOG] - Done in %fs\n" r_time
 
@@ -85,13 +85,6 @@ let render_bitmap file view size img =
   Printf.printf "w: %d, h: %d\n" w h;
 
   let bitmap = B.create w h in
-  for i = 0 to w - 1 do
-    B.set bitmap (Int.to_float i) 0. Color.white
-  done;
-  for i = 0 to w - 1 do
-    B.set bitmap (Int.to_float i) (Int.to_float (h - 1)) Color.green
-  done;
-  Printf.printf "width: %d, height: %d\n" (B.width bitmap) (B.height bitmap);
   let target = Bitmap_renderer.target bitmap in
   let warn w = Vgr.pp_warning Format.err_formatter w in
   let r = Vgr.create ~warn target `Other in
@@ -107,12 +100,7 @@ let () =
   let aspect = 1.618 in
   let size = Size2.v (aspect *. 10.) 10. (* mm *) in
   let view = Box2.v P2.o (Size2.v aspect 1.) in
-  (* let circle = P.empty |> P.circle (P2.v 0.5 0.5) 0.4 in *)
-  (* let image = I.cut circle (I.const (Color.v_srgb 0.314 0.784 0.471)) in *)
-  let l = P.empty |> P.line (P2.v 0.5 0.5) in
-  let image =
-    I.cut ~area:(`O { P.o with P.width = 0.1 }) l (I.const Color.red)
-  in
+  let image = Itest.two_sub_lines in
   log_rendering "cairo" (fun _ -> render_png_cairo "cairo.png" view size image);
   log_rendering "bitmap" (fun _ -> render_bitmap "bitmap.png" view size image)
 

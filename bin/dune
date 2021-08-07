@@ -1,6 +1,6 @@
 (executable
   (name main)
   (public_name vg-bitmap-test)
-  (modules main)
+  (modules main itest)
   (libraries gg vg vg.bitmap vg.cairo bimage bimage-unix bigarray)
   (flags (:standard -open StdLabels)))
