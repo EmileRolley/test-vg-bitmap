@@ -80,6 +80,7 @@ let closed_cbezier =
 let filled_cbezier =
   P.empty
   |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.5 0.5)
+  |> P.close
   |> simple_filled_cut ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
 
 (** PASS. (mod y-flip) *)
@@ -95,5 +96,24 @@ let mult_filled_cbeziers_bug =
   P.empty
   |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.5 0.5)
   |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.8 0.2)
+  |> P.close
+  |> simple_filled_cut ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
+
+(** PASS. (mod y-flip) *)
+let simple_qbezier =
+  P.empty |> P.qcurve (v 0.8 0.2) (v 0.5 0.5) |> P.close |> simple_cut
+
+(** PASS. (mod y-flip) *)
+let filled_qbezier =
+  P.empty
+  |> P.qcurve (v 0.6 0.2) (v 0.5 0.5)
+  |> P.close
+  |> simple_filled_cut ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
+
+(** PASS. (mod y-flip) *)
+let mult_filled_qbeziers =
+  P.empty
+  |> P.qcurve (v 0.8 0.2) (v 0.5 0.5)
+  |> P.qcurve (v 0.8 0.2) (v 0.6 0.3)
   |> P.close
   |> simple_filled_cut ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
