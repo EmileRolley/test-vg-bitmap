@@ -1,4 +1,4 @@
-(lang dune 2.0)
+(lang dune 2.7)
 (name vg-bitmap-test)
 (source (github EmileRolley/vg-bitmap-test))
 (license MIT)
@@ -12,6 +12,6 @@
  (synopsis "Temporary repository to store test programs for the WIP Vg bitmap renderer.")
  (depends
   (ocaml (>= 4.08.0))
-  (dune (>= 2.0))
+  (dune (>= 2.7))
   (alcotest :with-test)
   (odoc :with-doc)))

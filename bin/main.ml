@@ -1,3 +1,4 @@
+open Landmark
 open Bimage
 open Gg
 open Vg
@@ -44,7 +45,7 @@ let save path bitmap =
   let h = B.h bitmap in
   let img = Image.create f32 Bimage.rgb w h in
   ignore
-    (Image.for_each_pixel
+    (Image.for_each ~width:(B.w bitmap) ~height:(B.h bitmap)
        (fun x y _px ->
          let x' = Int.to_float x in
          let y' = Int.to_float y in
@@ -78,12 +79,14 @@ let render_png_cairo file view size img =
   close_out oc;
   r_time
 
+let render = register "render"
+
 let render_bitmap file view size img =
   let res = 300. /. 25.4 in
   let w = int_of_float (res *. Size2.w size) in
   let h = int_of_float (res *. Size2.h size) in
-  Printf.printf "w: %d, h: %d\n" w h;
 
+  Printf.printf "w: %d, h: %d\n" w h;
   let bitmap = B.create w h in
   let target = Bitmap_renderer.target bitmap in
   let warn w = Vgr.pp_warning Format.err_formatter w in
@@ -97,11 +100,11 @@ let render_bitmap file view size img =
   r_time
 
 let () =
-  let aspect = 1.618 in
-  let size = Size2.v (aspect *. 10.) 10. (* mm *) in
+  let aspect = 1. in
+  let size = Size2.v (aspect *. 60.) 60. (* mm *) in
   let view = Box2.v P2.o (Size2.v aspect 1.) in
-  let image = Itest.two_sub_lines in
+  let image = Itest.poly1 in
   log_rendering "cairo" (fun _ -> render_png_cairo "cairo.png" view size image);
-  log_rendering "bitmap" (fun _ -> render_bitmap "bitmap.png" view size image)
+  log_rendering "bitmap" (fun _ -> render_bitmap "bitmap2.png" view size image)
 
-(* How the renderer should be used. *)
+(* ignore (render_bitmap "bitmap.png" view size image) *)

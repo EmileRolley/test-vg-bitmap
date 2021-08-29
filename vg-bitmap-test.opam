@@ -9,12 +9,12 @@ homepage: "https://github.com/EmileRolley/vg-bitmap-test"
 bug-reports: "https://github.com/EmileRolley/vg-bitmap-test/issues"
 depends: [
   "ocaml" {>= "4.08.0"}
-  "dune" {>= "2.0"}
+  "dune" {>= "2.7" & >= "2.7"}
   "alcotest" {with-test}
   "odoc" {with-doc}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"

@@ -30,3 +30,9 @@ _opam/
 
 # Rendered test images
 *.png
+
+gmon.out
+perf.data
+prof
+prof2
+test.out

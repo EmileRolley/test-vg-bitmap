@@ -2,5 +2,10 @@
   (name main)
   (public_name vg-bitmap-test)
   (modules main itest)
-  (libraries gg vg vg.bitmap vg.cairo bimage bimage-unix bigarray)
-  (flags (:standard -open StdLabels)))
+  (libraries gg vg vg.bitmap vg.cairo bimage bimage-unix bigarray landmarks)
+  (flags (:standard -open StdLabels))
+  ; (preprocess (pps landmarks-ppx --auto))
+  (instrumentation (backend landmarks))
+)
+
+  ; (ocamlopt_flags :standard -p)
