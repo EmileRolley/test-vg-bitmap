@@ -60,7 +60,7 @@ let simple_stroked_square =
   |> P.rect (Box2.v (v 0.25 0.25) (v 0.5 0.5))
   |> simple_cut ~c:(Color.v 0.2 0.2 0.8 1.)
 
-(* FIXME: FAIL. (mod y-flip) *)
+(* PASS. (mod y-flip) *)
 let imbricated_stroked_squares =
   P.empty
   |> P.rect (Box2.v (v 0.25 0.25) (v 0.5 0.5))
@@ -78,7 +78,18 @@ let imbricated_filled_squares_same_dir =
   P.empty
   |> P.rect (Box2.v (v 0.25 0.25) (v 0.5 0.5))
   |> P.rect (Box2.v (v 0.3 0.3) (v 0.4 0.4))
-  |> simple_filled_cut ~area:`Aeo ~c:(Color.v 0.88 0.69 1. 1.)
+  |> filled_with_border ~area:`Anz ~c:(Color.v 0.88 0.69 1. 1.)
+
+(* PASS. (mod y-flip) *)
+let imbricated_filled_squares_not_same_dir =
+  P.empty
+  |> P.rect (Box2.v (v 0.25 0.25) (v 0.5 0.5))
+  |> P.sub (v 0.3 0.3)
+  |> P.line (v 0.3 0.7)
+  |> P.line (v 0.7 0.7)
+  |> P.line (v 0.7 0.3)
+  |> P.close
+  |> filled_with_border ~area:`Anz ~c:(Color.v 0.88 0.69 1. 1.)
 
 (** PASS. (mod y-flip) *)
 let basic_cbezier =
@@ -151,7 +162,7 @@ let poly1 =
   |> P.line (v 0.5 0.6)
   |> P.line (v 0.8 0.2)
   |> P.close
-  |> filled_with_border ~c:(Color.v 0.48 0.71 0.38 1.)
+  |> filled_with_border ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
 
 (** PASS. (mod y-flip) *)
 let star =
@@ -162,4 +173,4 @@ let star =
   |> P.line (v 0.1 0.5)
   |> P.line (v 0.5 0.5)
   |> P.close
-  |> filled_with_border ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
+  |> filled_with_border ~area:`Anz ~c:(Color.v 0.48 0.71 0.38 1.)
