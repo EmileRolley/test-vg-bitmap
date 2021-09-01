@@ -174,3 +174,15 @@ let star =
   |> P.line (v 0.5 0.5)
   |> P.close
   |> filled_with_border ~area:`Anz ~c:(Color.v 0.48 0.71 0.38 1.)
+
+(** PASS. *)
+let scaled_poly =
+  P.empty
+  |> P.sub (v 0.2 0.2)
+  |> P.line (v 0.2 0.6)
+  |> P.line (v 0.3 0.4)
+  |> P.line (v 0.5 0.6)
+  |> P.line (v 0.8 0.2)
+  |> P.close
+  |> filled_with_border ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
+  |> I.scale (v 0.5 0.5)
