@@ -34,16 +34,17 @@ module Bitmap_renderer = Vgr_bitmap.Make (B)
 (*  res *)
 
 (** Colors the pixel at ([x], [y]) of [img] with the color [c] *)
-let color_pixel (img : (float, Bimage.f32, Bimage.rgb) Bimage.Image.t) x y c =
+let color_pixel img x y c =
   Image.set img x y 0 (Color.r c);
   Image.set img x y 1 (Color.g c);
-  Image.set img x y 2 (Color.b c)
+  Image.set img x y 2 (Color.b c);
+  Image.set img x y 3 (Color.a c)
 
 (** Save the drawing as a PNG in [path] *)
 let save path bitmap =
   let w = B.w bitmap in
   let h = B.h bitmap in
-  let img = Image.create f32 Bimage.rgb w h in
+  let img = Image.create f32 Bimage.rgba w h in
   ignore
     (Image.for_each ~width:(B.w bitmap) ~height:(B.h bitmap)
        (fun x y _px ->
@@ -88,7 +89,7 @@ let render_bitmap file view size img =
 
   Printf.printf "w: %d, h: %d\n" w h;
   let bitmap = B.create w h in
-  let target = Bitmap_renderer.target bitmap in
+  let target = Bitmap_renderer.target bitmap res in
   let warn w = Vgr.pp_warning Format.err_formatter w in
   let r = Vgr.create ~warn target `Other in
   let r_time =
@@ -101,10 +102,10 @@ let render_bitmap file view size img =
 
 let () =
   let aspect = 1. in
-  let size = Size2.v (aspect *. 60.) 60. (* mm *) in
+  let size = Size2.v (aspect *. 10.) 10. (* mm *) in
   let view = Box2.v P2.o (Size2.v aspect 1.) in
-  let image = Itest.poly1 in
+  let image = Itest.two_stroked_straight_lines in
   log_rendering "cairo" (fun _ -> render_png_cairo "cairo.png" view size image);
-  log_rendering "bitmap" (fun _ -> render_bitmap "bitmap2.png" view size image)
+  log_rendering "bitmap" (fun _ -> render_bitmap "bitmap.png" view size image)
 
 (* ignore (render_bitmap "bitmap.png" view size image) *)

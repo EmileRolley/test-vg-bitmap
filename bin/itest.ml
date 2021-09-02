@@ -2,7 +2,7 @@ open Gg
 open Vg
 open P2
 
-let simple_cut ?(c = Color.black) p =
+let simple_cut ?(c = Color.v_srgb 0.48 0.71 0.38 ~a:1.) p =
   I.cut ~area:(`O { P.o with P.width = 0.01 }) p (I.const c)
 
 let simple_filled_cut ?(area = `Anz) ?(c = Color.black) p =
