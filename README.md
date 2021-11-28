@@ -1,12 +1,42 @@
-# `Vgr_bitmap` test repository
+<br />
+<p align="center">
+  <h3 align="center">
+	Vgr_pixmap test repository
+  </h3>
 
-> Temporary repository to store test programs for the WIP
-> [`Vgr_bitmap`](https://github.com/EmileRolley/vg/blob/vgr-bitmap/src/vgr_bitmap.ml)
-> renderer.
+  <p align="center">
+    Temporary repository to store test programs for the WIP
+    <a href="https://github.com/EmileRolley/vgr-pixmap"<code>Vgr_pixmap</code></a>
+    renderer.
+  <!-- <br /> -->
+   <!--  <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a> -->
+    <br />
+   <!--  <a href="https://github.com/github_username/repo_name">View Demo</a> -->
+    <a href="https://github.com/EmileRolley/sustainable-computing-resources/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/EmileRolley/sustainable-computing-resources/pulls">Contribute</a>
+  </p>
+</p>
+
+
+
+<details>
+  <summary>Table of Contents</summary>
+
+<!-- vim-markdown-toc GitLab -->
+
+* [Results](#results)
+  * [Rendering time comparison](#rendering-time-comparison)
+
+<!-- vim-markdown-toc -->
+
+</details>
+
+---
 
 ## Results
 
-Result images produced by the `Vgr_cairo` and `Vgr_bitmap` are stored in `./imgs/`.
+Result images produced by the `Vgr_cairo` and `Vgr_pixmap` are stored in `./imgs/`.
 
 And could be re-rendered by executing:
 ```
@@ -16,7 +46,7 @@ dune build && ./_build/default/bin/main.exe
 ### Rendering time comparison
 
 
-|                   `Vg` image (1181x1181) | `Vgr_cairo` rendering time | `Vgr_bitmap` rendering time |
+|                   `Vg` image (1181x1181) | `Vgr_cairo` rendering time | `Vgr_pixmap` rendering time |
 |-----------------------------------------:|:--------------------------:|:---------------------------:|
 |               two_stroked_straight_lines |          0.055174s         |          0.000070s          |
 |                         closed_sub_paths |          0.055282s         |          0.000061s          |
