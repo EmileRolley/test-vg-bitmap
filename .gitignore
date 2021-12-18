@@ -29,7 +29,7 @@ setup.log
 _opam/
 
 # Rendered test images
-*.png
+# *.png
 
 gmon.out
 perf.data

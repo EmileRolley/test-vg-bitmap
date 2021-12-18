@@ -2,21 +2,21 @@ open Gg
 open Vg
 open P2
 
-let simple_cut ?(c = Color.v_srgb 0.48 0.71 0.38 ~a:1.) p =
-  I.cut ~area:(`O { P.o with P.width = 0.01 }) p (I.const c)
+let simple_cut ?(w = 0.07) ?(c = Color.v_srgb 0.48 0.71 0.38 ~a:1.) p =
+  I.cut ~area:(`O { P.o with P.width = w }) p (I.const c)
 
 let simple_filled_cut ?(area = `Anz) ?(c = Color.black) p =
   I.cut ~area p (I.const c)
 
 let filled_with_border ?(area = `Anz) ?(c = Color.black) p =
-  p |> simple_filled_cut ~area ~c |> I.blend (simple_cut p)
+  p |> simple_filled_cut ~area ~c |> I.blend (simple_cut p ~w:0.02)
 
 (* PASS. *)
 let two_stroked_straight_lines =
   P.empty
-  |> P.sub (v 0.2 0.)
-  |> P.line (v 0.5 0.25)
-  |> P.line (v 0.25 0.5)
+  |> P.sub (v 0.2 0.3)
+  |> P.line (v 0.75 0.5)
+  |> P.line (v 0.2 0.85)
   |> simple_cut
 
 (* PASS. *)
@@ -40,11 +40,11 @@ let two_stroked_sub_lines =
 (* PASS. *)
 let closed_sub_paths =
   P.empty
-  |> P.sub (v 0.2 0.)
-  |> P.line (v 0.5 0.25)
-  |> P.sub (v 0.5 0.5)
-  |> P.line (v 0.6 0.5)
-  |> P.line (v 0.6 0.6)
+  |> P.sub (v 0.15 0.15)
+  |> P.line (v 0.5 0.5)
+  |> P.sub (v 0.7 0.6)
+  |> P.line (v 0.9 0.7)
+  |> P.line (v 0.7 0.9)
   |> P.close
   |> simple_cut
 
@@ -64,7 +64,7 @@ let simple_stroked_square =
 let imbricated_squares =
   P.empty
   |> P.rect (Box2.v (v 0.25 0.25) (v 0.5 0.5))
-  |> P.rect (Box2.v (v 0.3 0.3) (v 0.4 0.4))
+  |> P.rect (Box2.v (v 0.3 0.3) (v 0.6 0.6))
   |> filled_with_border ~area:`Anz ~c:(Color.v 0.2 0.2 0.8 1.)
 
 (* PASS. *)
@@ -76,19 +76,21 @@ let simple_filled_rect =
 (* PASS. *)
 let imbricated_filled_squares_same_dir =
   P.empty
-  |> P.rect (Box2.v (v 0.25 0.25) (v 0.5 0.5))
+  |> P.rect (Box2.v (v 0.1 0.1) (v 0.8 0.8))
+  |> P.rect (Box2.v (v 0.2 0.2) (v 0.6 0.6))
   |> P.rect (Box2.v (v 0.3 0.3) (v 0.4 0.4))
   |> filled_with_border ~area:`Anz ~c:(Color.v 0.88 0.69 1. 1.)
 
 (* PASS. *)
 let imbricated_filled_squares_not_same_dir =
   P.empty
-  |> P.rect (Box2.v (v 0.25 0.25) (v 0.5 0.5))
-  |> P.sub (v 0.3 0.3)
-  |> P.line (v 0.3 0.7)
-  |> P.line (v 0.7 0.7)
-  |> P.line (v 0.7 0.3)
+  |> P.rect (Box2.v (v 0.1 0.1) (v 0.8 0.8))
+  |> P.sub (v 0.2 0.2)
+  |> P.line (v 0.2 0.8)
+  |> P.line (v 0.8 0.8)
+  |> P.line (v 0.8 0.2)
   |> P.close
+  |> P.rect (Box2.v (v 0.3 0.3) (v 0.4 0.4))
   |> filled_with_border ~area:`Anz ~c:(Color.v 0.88 0.69 1. 1.)
 
 (** PASS. *)
@@ -98,21 +100,21 @@ let basic_cbezier =
 (** PASS. *)
 let closed_cbezier =
   P.empty
-  |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.5 0.5)
+  |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.5 0.8)
   |> P.close
   |> simple_cut
 
 (** PASS. *)
 let filled_cbezier =
   P.empty
-  |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.5 0.5)
+  |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.5 0.8)
   |> P.close
   |> simple_filled_cut ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
 
 (** PASS. *)
 let mult_filled_cbeziers =
   P.empty
-  |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.5 0.5)
+  |> P.ccurve (v 0.6 0.2) (v 0.6 0.2) (v 0.5 0.8)
   |> P.ccurve (v 0.8 0.2) (v 0.8 0.2) (v 0.6 0.3)
   |> P.close
   |> simple_filled_cut ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
@@ -127,7 +129,7 @@ let mult_filled_cbeziers_bug =
 
 (** PASS. *)
 let simple_qbezier =
-  P.empty |> P.qcurve (v 0.8 0.2) (v 0.5 0.5) |> P.close |> simple_cut
+  P.empty |> P.qcurve (v 0.8 0.2) (v 0.6 0.8) |> P.close |> simple_cut
 
 (** PASS. *)
 let filled_qbezier =
@@ -157,9 +159,9 @@ let triangle =
 let poly1 =
   P.empty
   |> P.sub (v 0.2 0.2)
-  |> P.line (v 0.2 0.6)
+  |> P.line (v 0.2 0.7)
   |> P.line (v 0.3 0.4)
-  |> P.line (v 0.5 0.6)
+  |> P.line (v 0.5 0.7)
   |> P.line (v 0.8 0.2)
   |> P.close
   |> filled_with_border ~area:`Aeo ~c:(Color.v 0.48 0.71 0.38 1.)
@@ -167,10 +169,10 @@ let poly1 =
 let star =
   P.empty
   |> P.sub (v 0.2 0.1)
-  |> P.line (v 0.3 0.7)
-  |> P.line (v 0.4 0.1)
-  |> P.line (v 0.1 0.5)
-  |> P.line (v 0.5 0.5)
+  |> P.line (v 0.5 0.9)
+  |> P.line (v 0.8 0.1)
+  |> P.line (v 0.1 0.65)
+  |> P.line (v 0.9 0.65)
   |> P.close
 
 (** PASS. *)
@@ -184,7 +186,7 @@ let eo_star =
 (** PASS. *)
 let scaled_poly = I.scale (v 0.5 0.5) poly1
 
-(** PASS. *)
+(** ERR. *)
 let moved_poly = I.move (v 0.25 0.25) scaled_poly
 
 (** PASS. *)
@@ -306,22 +308,23 @@ let circle = P.empty |> P.circle (P2.v 0.5 0.5) 0.25 |> simple_cut
 
 let vg_imgs =
   [|
-    ("two_stroked_straight_lines", two_stroked_straight_lines);
-    ("closed_sub_paths", closed_sub_paths);
-    ( "imbricated_filled_squares_not_same_dir",
+    (0, "two_stroked_straight_lines", two_stroked_straight_lines);
+    (1, "closed_sub_paths", closed_sub_paths);
+    ( 2,
+      "imbricated_filled_squares_not_same_dir",
       imbricated_filled_squares_not_same_dir );
-    ("imbricated_filled_squares_same_dir", imbricated_filled_squares_same_dir);
-    ("closed_cbezier", closed_cbezier);
-    ("filled_cbezier", filled_cbezier);
-    ("mult_filled_cbeziers", mult_filled_cbeziers);
-    ("simple_qbezier", simple_qbezier);
-    ("non_zero_rule_star", nz_star);
-    ("even_odd_rule_star", eo_star);
-    ("poly1", poly1);
-    ("scaled_poly", scaled_poly);
-    ("moved_poly", moved_poly);
-    ("rotated_poly", rotated_poly);
-    ("tr_matrix_poly", m_poly);
+    (3, "imbricated_filled_squares_same_dir", imbricated_filled_squares_same_dir);
+    (4, "closed_cbezier", closed_cbezier);
+    (5, "filled_cbezier", filled_cbezier);
+    (6, "mult_filled_cbeziers", mult_filled_cbeziers);
+    (7, "simple_qbezier", simple_qbezier);
+    (8, "non_zero_rule_star", nz_star);
+    (9, "even_odd_rule_star", eo_star);
+    (10, "poly1", poly1);
+    (11, "scaled_poly", scaled_poly);
+    (12, "moved_poly", moved_poly);
+    (13, "rotated_poly", rotated_poly);
+    (14, "tr_matrix_poly", m_poly);
   |]
 
 (* |> filled_with_border ~area:`Anz ~c:(Color.v 0.48 0.71 0.38 1.) *)
