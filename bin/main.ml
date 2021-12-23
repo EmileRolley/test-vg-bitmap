@@ -55,7 +55,8 @@ let render_pixmap file view size img =
   let h = int_of_float (res *. Size2.h size) in
 
   let pixmap = Pm.create w h in
-  let target = Pixmap_renderer.target pixmap res in
+  (* NOTE: change [use_width] to false in order to have 1-pixel width lines. *)
+  let target = Pixmap_renderer.target pixmap res ~use_width:true in
   let warn w = Vgr.pp_warning Format.err_formatter w in
   let r = Vgr.create ~warn target `Other in
   let r_time =
@@ -66,7 +67,6 @@ let render_pixmap file view size img =
   save file pixmap;
   r_time
 
-(* FIXME: doesn't work anymore *)
 let () =
   let aspect = 1. in
   let size = Size2.v (aspect *. 100.) 100. (* mm *) in

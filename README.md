@@ -39,9 +39,9 @@
     * [9. Even-odd filled star](#9-even-odd-filled-star)
     * [10. Simple polygon with border](#10-simple-polygon-with-border)
     * [11. Scaled polygon](#11-scaled-polygon)
-    * [12. Translated polygon - _`NOT PASSING`_](#12-translated-polygon-_not-passing)
+    * [12. Translated polygon](#12-translated-polygon)
     * [13. Rotated polygon](#13-rotated-polygon)
-    * [14. Applied transformation matrix - _`NOT PASSING`_](#14-applied-transformation-matrix-_not-passing)
+    * [14. Applied transformation matrix](#14-applied-transformation-matrix)
   * [~~Rendering time comparison~~ _Deprecated_](#rendering-time-comparison-_deprecated)
 
 <!-- vim-markdown-toc -->
@@ -353,7 +353,8 @@ let scaled_poly = I.scale (v 0.5 0.5) poly1
 
 ---
 
-#### 12. Translated polygon - _`NOT PASSING`_
+
+#### 12. Translated polygon
 
 <details>
   <summary>Show source code</summary>
@@ -393,7 +394,7 @@ let rotated_poly = I.rot 0.20 moved_poly
 
 ---
 
-#### 14. Applied transformation matrix - _`NOT PASSING`_
+#### 14. Applied transformation matrix
 
 <details>
   <summary>Show source code</summary>
